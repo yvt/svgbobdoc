@@ -18,6 +18,7 @@ unicode-width = "0.1"
 
 [lib]
 proc-macro = true
+path = "src/lib.rs"
 
 [workspace]
 members = [
