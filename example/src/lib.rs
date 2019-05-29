@@ -24,9 +24,9 @@
 /// Some module.
 ///
 /// ```svgbob,
-///  .--------------------.
-///  | Diagrams here      |
-///  `--------------------'
+///  .---------------.
+///  | Diagrams here |
+///  `---------------'
 /// ```
 pub mod module {
     #![svgbobdoc::doc]
