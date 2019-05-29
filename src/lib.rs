@@ -472,9 +472,7 @@ fn width_xml_text(s: &str) -> usize {
     width
 }
 
-/// Render `svgbob` code blocks as SVG images using [`svgbob`].
-///
-/// [`svgbob`]: https://crates.io/crates/svgbob
+/// Render ASCII-diagram code blocks in doc comments as SVG images.
 ///
 /// See [the module-level documentation](../index.html) for more.
 #[proc_macro_attribute]
