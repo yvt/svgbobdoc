@@ -9,7 +9,7 @@ repository = "https://github.com/yvt/svgbobdoc"
 description = """
 Renders ASCII diagrams in doc comments as SVG images.
 """
-keywords = ["rustdoc", "documentation", "markdown", "svg", "diagram", "figure"]
+keywords = ["rustdoc", "documentation", "svg", "diagram", "figure"]
 categories = ["development-tools"]
 
 [dependencies]
