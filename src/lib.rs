@@ -1,3 +1,39 @@
+//! This crate provides a procedural macro `#[svgbobdoc::doc]` for rendering
+//! code blocks as SVG images using [`svgbob`].
+//!
+//! [`svgbob`]: https://github.com/ivanceras/svgbob
+//!
+//! # Usage
+//!
+//! Add the following line to `Cargo.toml`.
+//!
+//! ```toml
+//! svgbobdoc = "0.1"
+//! ```
+//!
+//! Add the attribute `#[svgbobdoc::doc]` to the items to documentate.
+//! Use `svgbob` code blocks to write ASCII diagrams.
+//!
+//!     #[svgbobdoc::doc]
+//!     /// Some structure.
+//!     ///
+//!     /// ```svgbob,
+//!     ///  .--------------------.
+//!     ///  | Diagrams here      |
+//!     ///  `--------------------'
+//!     /// ```
+//!     pub struct TestStruct {}
+//!
+//! See the `example` directory for a complete example.
+//!
+//! ## Tips
+//!
+//!  - Using this macro increases the compilation time. If you don't mind
+//!    activating unstable features, the `doc_cfg` feature ([#43781]) can be
+//!    used to conditionally enable the macro by the syntax
+//!    `#[cfg_attr(rustdoc, svgbobdoc::doc)]`.
+//!
+//! [#43781]: https://github.com/rust-lang/rust/issues/43781
 extern crate proc_macro;
 
 use proc_macro2::{Group, Span, TokenStream, TokenTree};
@@ -432,7 +468,11 @@ fn width_xml_text(s: &str) -> usize {
     width
 }
 
-/// Render `svgbob` code blocks as SVG images using [`svgbob`](svgbob).
+/// Render `svgbob` code blocks as SVG images using [`svgbob`].
+///
+/// [`svgbob`]: https://crates.io/crates/svgbob
+///
+/// See [the module-level documentation](../index.html) for more.
 #[proc_macro_attribute]
 pub fn doc(
     _attr: proc_macro::TokenStream,
