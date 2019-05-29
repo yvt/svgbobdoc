@@ -1,0 +1,23 @@
+[package]
+name = "svgbobdoc"
+version = "0.1.0"
+authors = ["yvt <i@yvt.jp>"]
+edition = "2018"
+
+[dependencies]
+syn = "0.15"
+quote = "0.6.12"
+svgbob = "0.4.1"
+proc-macro2 = "0.4"
+regex = "1"
+lazy_static = "1"
+base64 = "0.10.1"
+
+[lib]
+proc-macro = true
+
+[workspace]
+members = [
+    ".",
+    "example",
+]
