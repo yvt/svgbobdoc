@@ -1,13 +1,17 @@
-//! This crate provides a procedural macro `#[svgbobdoc::doc]` for rendering
-//! code blocks as SVG images using [`svgbob`].
+//! This crate provides a procedural macro `#[svgbobdoc::doc]` that renders
+//! ASCII diagrams in doc comments as SVG images using [`svgbob`].
 //!
 //! [`svgbob`]: https://github.com/ivanceras/svgbob
+//!
+//! <img src="https://yvt.github.io/svgbobdoc/20190529-zhang_hilbert-2.png"
+//!    style="border: 10px solid rgba(192, 192, 192, 0.15)">
 //!
 //! # Usage
 //!
 //! Add the following line to `Cargo.toml`.
 //!
 //! ```toml
+//! [dependencies]
 //! svgbobdoc = "0.1"
 //! ```
 //!
@@ -17,7 +21,7 @@
 //!     #[svgbobdoc::doc]
 //!     /// Some structure.
 //!     ///
-//!     /// ```svgbob,
+//!     /// ```svgbob
 //!     ///  .--------------------.
 //!     ///  | Diagrams here      |
 //!     ///  `--------------------'
