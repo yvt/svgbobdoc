@@ -12,7 +12,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! svgbobdoc = "0.1"
+//! svgbobdoc = "0.2"
 //! ```
 //!
 //! Add the attribute `#[svgbobdoc::transform]` to the items to documentate.
