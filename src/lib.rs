@@ -42,6 +42,7 @@ extern crate proc_macro;
 
 use proc_macro2::{Group, Span, TokenStream, TokenTree};
 use quote::{ToTokens, TokenStreamExt};
+use std::mem::replace;
 use syn::{
     parse::{Parse, ParseStream},
     parse2, parse_macro_input,
@@ -471,22 +472,10 @@ fn width_xml_text(s: &str) -> usize {
     width += s[i..].width();
     width
 }
-
-/// Render ASCII-diagram code blocks in doc comments as SVG images.
-///
-/// See [the module-level documentation](../index.html) for more.
-#[proc_macro_attribute]
-pub fn transform(
-    _attr: proc_macro::TokenStream,
-    tokens: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
-    let tokens2 = tokens.clone();
-    let mut item: Item = parse_macro_input!(tokens2);
-
-    // Look for tagged code blocks and replace them
+fn transform_maybedocattrs(attrs: Vec<MaybeDocAttr>) -> Result<Vec<MaybeDocAttr>> {
     let mut new_attrs = Vec::new();
     let mut text_proc = TextProcState::new();
-    for attr in item.attrs.drain(..) {
+    for attr in attrs {
         match attr {
             MaybeDocAttr::Doc(attr, mut nv) => {
                 let fragment: String = if let Lit::Str(s) = &nv.lit {
@@ -519,11 +508,31 @@ pub fn transform(
             }
         }
     }
-    item.attrs = new_attrs;
 
-    if let Err(e) = text_proc.finalize() {
-        return e.to_compile_error().into();
-    }
+    text_proc.finalize()?;
+
+    Ok(new_attrs)
+}
+
+/// Render ASCII-diagram code blocks in doc comments as SVG images.
+///
+/// The item and all of its documentable direct children which cannot have
+/// attribute macros (e.g., fields) are transformed.
+///
+/// See [the module-level documentation](../index.html) for more.
+#[proc_macro_attribute]
+pub fn transform(
+    _attr: proc_macro::TokenStream,
+    tokens: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    let tokens2 = tokens.clone();
+    let mut item: Item = parse_macro_input!(tokens2);
+
+    // Look for tagged code blocks and replace them
+    item.attrs = match transform_maybedocattrs(replace(&mut item.attrs, Vec::new())) {
+        Ok(attrs) => attrs,
+        Err(e) => return e.to_compile_error().into(),
+    };
 
     item.into_token_stream().into()
 }
