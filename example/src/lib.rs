@@ -8,7 +8,7 @@
 #![feature(doc_cfg)]
 
 // TODO: Get this working... Hopefully when they are stabilized.
-// #![svgbobdoc::doc]
+// #![svgbobdoc::transform]
 
 //! Some module.
 //!
@@ -29,13 +29,13 @@
 ///  `---------------'
 /// ```
 pub mod module {
-    #![svgbobdoc::doc]
+    #![svgbobdoc::transform]
     //! ```svgbob,
     //! hoge
     //! ```
 }
 
-#[cfg_attr(rustdoc, svgbobdoc::doc)]
+#[cfg_attr(rustdoc, svgbobdoc::transform)]
 /// Some function.
 ///
 /// ```svgbob,
@@ -45,7 +45,7 @@ pub mod module {
 /// ```
 pub fn test_function() {}
 
-#[svgbobdoc::doc]
+#[svgbobdoc::transform]
 /// Some structure.
 ///
 /// ```svgbob,
@@ -55,7 +55,7 @@ pub fn test_function() {}
 /// ```
 pub struct TestStruct {}
 
-#[svgbobdoc::doc]
+#[svgbobdoc::transform]
 /**
  * Some impl.
  *
@@ -66,7 +66,7 @@ pub struct TestStruct {}
  * ```
  */
 impl TestStruct {
-    #[svgbobdoc::doc]
+    #[svgbobdoc::transform]
     /// Some method.
     ///
     /// ```svgbob,

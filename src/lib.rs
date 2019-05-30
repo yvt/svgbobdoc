@@ -1,4 +1,4 @@
-//! This crate provides a procedural macro `#[svgbobdoc::doc]` that renders
+//! This crate provides a procedural macro that renders
 //! ASCII diagrams in doc comments as SVG images using [`svgbob`].
 //!
 //! [`svgbob`]: https://github.com/ivanceras/svgbob
@@ -15,10 +15,10 @@
 //! svgbobdoc = "0.1"
 //! ```
 //!
-//! Add the attribute `#[svgbobdoc::doc]` to the items to documentate.
+//! Add the attribute `#[svgbobdoc::transform]` to the items to documentate.
 //! Use `svgbob` code blocks to write ASCII diagrams.
 //!
-//!     #[svgbobdoc::doc]
+//!     #[svgbobdoc::transform]
 //!     /// Some structure.
 //!     ///
 //!     /// ```svgbob
@@ -35,7 +35,7 @@
 //!  - Using this macro increases the compilation time. If you don't mind
 //!    activating unstable features, the `doc_cfg` feature ([#43781]) can be
 //!    used to conditionally enable the macro by the syntax
-//!    `#[cfg_attr(rustdoc, svgbobdoc::doc)]`.
+//!    `#[cfg_attr(rustdoc, svgbobdoc::transform)]`.
 //!
 //! [#43781]: https://github.com/rust-lang/rust/issues/43781
 extern crate proc_macro;
@@ -476,7 +476,7 @@ fn width_xml_text(s: &str) -> usize {
 ///
 /// See [the module-level documentation](../index.html) for more.
 #[proc_macro_attribute]
-pub fn doc(
+pub fn transform(
     _attr: proc_macro::TokenStream,
     tokens: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
