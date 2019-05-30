@@ -51,7 +51,19 @@ pub fn test_function() {}
 ///  | Diagrams here      |
 ///  `--------------------'
 /// ```
-pub struct TestStruct {}
+pub struct TestStruct {
+    /// Fields [can't have] attribute macros, so the struct's `#[transform]`
+    /// handles the fields as well.
+    ///
+    /// [can't have]: https://github.com/rust-lang/rust/issues/53012
+    ///
+    /// ```svgbob,
+    ///  .--------------------.
+    ///  | Diagrams here      |
+    ///  `--------------------'
+    /// ```
+    pub field1: u32,
+}
 
 #[svgbobdoc::transform]
 /**

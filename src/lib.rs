@@ -41,17 +41,20 @@
 extern crate proc_macro;
 
 use proc_macro2::{Group, TokenStream, TokenTree};
-use quote::{ToTokens, TokenStreamExt};
+use quote::{quote, ToTokens, TokenStreamExt};
 use std::mem::replace;
 use syn::{
+    self,
     parse::{Parse, ParseStream},
     parse2, parse_macro_input,
     spanned::Spanned,
-    token, AttrStyle, Attribute, Error, Lit, LitStr, Meta, MetaNameValue, Result, Token,
+    token, AttrStyle, Attribute, DeriveInput, Error, Lit, LitStr, Meta, MetaNameValue, Result,
+    Token,
 };
 
 mod textproc;
 
+/// An `Attribute`, recognized as a doc comment or not.
 #[derive(Clone)]
 enum MaybeDocAttr {
     /// A doc comment attribute.
@@ -104,7 +107,21 @@ impl ToTokens for MaybeDocAttr {
     }
 }
 
-/// A pre-processed brace inside an item defintion.
+impl Into<Attribute> for MaybeDocAttr {
+    /// The mostly-lossless conversion to `Attribute`.
+    fn into(self) -> Attribute {
+        match self {
+            MaybeDocAttr::Doc(mut attr, nv) => {
+                let lit = nv.lit;
+                attr.tts = quote! { = #lit };
+                attr
+            }
+            MaybeDocAttr::Other(attr) => attr,
+        }
+    }
+}
+
+/// A pre-processed brace inside an item defintion. Used by `OtherItem::parse`.
 ///
 /// # Examples
 ///
@@ -217,6 +234,37 @@ impl ToTokens for OtherItem {
     }
 }
 
+/// An item processed by `transform`.
+enum Item {
+    Derivable(DeriveInput),
+    Other(OtherItem),
+}
+
+impl Parse for Item {
+    fn parse(input: ParseStream) -> Result<Self> {
+        if input.fork().parse::<DeriveInput>().is_ok() {
+            // TODO: This is not ideal from a performance point of view
+            let derive_item = input.parse().unwrap();
+            Ok(Item::Derivable(derive_item))
+        } else {
+            input.parse().map(Item::Other)
+        }
+    }
+}
+
+impl ToTokens for Item {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        match self {
+            Item::Derivable(item) => {
+                item.to_tokens(tokens);
+            }
+            Item::Other(item) => {
+                item.to_tokens(tokens);
+            }
+        }
+    }
+}
+
 fn transform_maybedocattrs(attrs: Vec<MaybeDocAttr>) -> Result<Vec<MaybeDocAttr>> {
     use textproc::{TextProcOutput, TextProcState};
 
@@ -261,10 +309,33 @@ fn transform_maybedocattrs(attrs: Vec<MaybeDocAttr>) -> Result<Vec<MaybeDocAttr>
     Ok(new_attrs)
 }
 
+fn transform_attributes(attrs: Vec<Attribute>) -> Result<Vec<Attribute>> {
+    let mda = attrs
+        .into_iter()
+        .map(MaybeDocAttr::from_attribute)
+        .collect::<Result<Vec<_>>>()?;
+
+    let mda = transform_maybedocattrs(mda)?;
+
+    Ok(mda.into_iter().map(MaybeDocAttr::into).collect())
+}
+
+fn transform_attributes_inplace(attrs: &mut Vec<Attribute>) -> Result<()> {
+    *attrs = transform_attributes(replace(attrs, Vec::new()))?;
+    Ok(())
+}
+
+fn handle_error(cb: impl FnOnce() -> Result<proc_macro::TokenStream>) -> proc_macro::TokenStream {
+    match cb() {
+        Ok(tokens) => tokens,
+        Err(e) => e.to_compile_error().into(),
+    }
+}
+
 /// Render ASCII-diagram code blocks in doc comments as SVG images.
 ///
-/// The item and all of its documentable direct children which cannot have
-/// attribute macros (e.g., fields) are transformed.
+/// This macro transforms the attached item and all of its documentable fields
+/// (e.g., fields, which cannot have attribute macros).
 ///
 /// See [the module-level documentation](../index.html) for more.
 #[proc_macro_attribute]
@@ -272,16 +343,54 @@ pub fn transform(
     _attr: proc_macro::TokenStream,
     tokens: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    let tokens2 = tokens.clone();
-    // TODO: Special-case structs, unions, and enums to handle inner documentable
-    //       non-items
-    let mut item: OtherItem = parse_macro_input!(tokens2);
+    let mut item: Item = parse_macro_input!(tokens);
 
-    // Look for tagged code blocks and replace them
-    item.attrs = match transform_maybedocattrs(replace(&mut item.attrs, Vec::new())) {
-        Ok(attrs) => attrs,
-        Err(e) => return e.to_compile_error().into(),
-    };
+    handle_error(|| {
+        match &mut item {
+            Item::Derivable(item) => {
+                // The outer doc comments
+                transform_attributes_inplace(&mut item.attrs)?;
 
-    item.into_token_stream().into()
+                match &mut item.data {
+                    syn::Data::Struct(syn::DataStruct {
+                        fields: syn::Fields::Named(syn::FieldsNamed { named, .. }),
+                        ..
+                    }) => {
+                        // Process named fields
+                        for field in named.iter_mut() {
+                            transform_attributes_inplace(&mut field.attrs)?;
+                        }
+                    }
+                    syn::Data::Enum(data) => {
+                        // Process variants
+                        for variant in data.variants.iter_mut() {
+                            transform_attributes_inplace(&mut variant.attrs)?;
+
+                            // If the variant has fields, process them as well
+                            if let syn::Fields::Named(syn::FieldsNamed { named, .. }) =
+                                &mut variant.fields
+                            {
+                                for field in named.iter_mut() {
+                                    transform_attributes_inplace(&mut field.attrs)?;
+                                }
+                            }
+                        }
+                    }
+                    syn::Data::Union(data) => {
+                        // Process named fields
+                        for field in data.fields.named.iter_mut() {
+                            transform_attributes_inplace(&mut field.attrs)?;
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            Item::Other(item) => {
+                // Look for tagged code blocks and replace them
+                item.attrs = transform_maybedocattrs(replace(&mut item.attrs, Vec::new()))?;
+            }
+        }
+
+        Ok(item.into_token_stream().into())
+    })
 }
