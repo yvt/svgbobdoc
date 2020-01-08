@@ -12,6 +12,9 @@ Renders ASCII diagrams in doc comments as SVG images.
 keywords = ["rustdoc", "documentation", "svg", "diagram", "figure"]
 categories = ["development-tools"]
 
+[badges]
+maintenance = { status = "passively-maintained" }
+
 [dependencies]
 syn = "0.15"
 quote = "0.6.12"
