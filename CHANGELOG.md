@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.2.2] - 2020-03-30
+
 - Upgraded `syn`, `quote`, and `proc-macro2` to 1.x.
 - Added support for `base64` 0.11 and 0.12.
 
@@ -23,6 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Initial release.
 
-[Unreleased]: https://github.com/yvt/svgbobdoc/compare/0.2.1...HEAD
+[Unreleased]: https://github.com/yvt/svgbobdoc/compare/0.2.2...HEAD
+[0.2.2]: https://github.com/yvt/svgbobdoc/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/yvt/svgbobdoc/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/yvt/svgbobdoc/compare/0.1.0...0.2.0
