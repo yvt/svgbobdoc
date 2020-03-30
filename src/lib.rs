@@ -134,7 +134,7 @@ impl Into<Attribute> for MaybeDocAttr {
         match self {
             MaybeDocAttr::Doc(mut attr, nv) => {
                 let lit = nv.lit;
-                attr.tts = quote! { = #lit };
+                attr.tokens = quote! { = #lit };
                 attr
             }
             MaybeDocAttr::Other(attr) => attr,

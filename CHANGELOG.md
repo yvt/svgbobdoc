@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- Upgraded `syn`, `quote`, and `proc-macro2` to 1.x.
+
 ## [0.2.1] - 2020-01-08
 
 - Added a maintenance status badge

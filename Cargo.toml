@@ -16,10 +16,10 @@ categories = ["development-tools"]
 maintenance = { status = "passively-maintained" }
 
 [dependencies]
-syn = "0.15"
-quote = "0.6.12"
+syn = "1"
+quote = "1"
 svgbob = "0.4.1"
-proc-macro2 = "0.4"
+proc-macro2 = "1"
 regex = "1"
 lazy_static = "1"
 base64 = "0.10.1"
