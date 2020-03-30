@@ -22,7 +22,7 @@ svgbob = "0.4.1"
 proc-macro2 = "1"
 regex = "1"
 lazy_static = "1"
-base64 = "0.10.1"
+base64 = ">= 0.5.2, < 0.13"
 svg = "0.5"
 unicode-width = "0.1"
 
