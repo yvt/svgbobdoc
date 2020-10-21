@@ -1,7 +1,7 @@
 // These features are required to apply custom attributes on modules.
 #![feature(proc_macro_hygiene)]
 #![feature(custom_inner_attributes)]
-// The use of `#[cfg_attr(rustdoc, ...)]` is recommended to improve
+// The use of `#[cfg_attr(doc, ...)]` is recommended to improve
 // the compilation time on non-doc builds.
 // Unfortunately, it's currently feature-gated.
 #![feature(doc_cfg)]
@@ -33,7 +33,7 @@ pub mod module {
     //! ```
 }
 
-#[cfg_attr(rustdoc, svgbobdoc::transform)]
+#[cfg_attr(doc, svgbobdoc::transform)]
 /// Some function.
 ///
 /// ```svgbob,

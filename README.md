@@ -39,7 +39,7 @@ See the `example` directory for a complete example.
  - Using this macro increases the compilation time. If you don't mind
    activating unstable features, the `doc_cfg` feature ([#43781]) can be
    used to conditionally enable the macro by the syntax
-   `#[cfg_attr(rustdoc, svgbobdoc::transform)]`.
+   `#[cfg_attr(doc, svgbobdoc::transform)]`.
 
 [#43781]: https://github.com/rust-lang/rust/issues/43781
 
