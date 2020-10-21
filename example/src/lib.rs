@@ -33,6 +33,7 @@ pub mod module {
     //! ```
 }
 
+#[doc(cfg(feature = "xxx"))]
 #[cfg_attr(doc, svgbobdoc::transform)]
 /// Some function.
 ///

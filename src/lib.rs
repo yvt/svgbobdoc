@@ -100,10 +100,8 @@ impl MaybeDocAttr {
                     Err(Error::new(nv.lit.span(), "doc comment must be a string"))
                 }
             } else {
-                Err(Error::new(
-                    meta.span(),
-                    "doc comment must be a name-value attribute",
-                ))
+                // Ignore unrecognized form
+                Ok(MaybeDocAttr::Other(attr))
             }
         } else {
             Ok(MaybeDocAttr::Other(attr))
