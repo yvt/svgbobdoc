@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.2.3] - 2020-10-22
+
+- Fixed the version specification of `lazy_static`.
+- Unrecognized forms of `#[doc ...]` are now ignored. Examples:
+    - `#[doc(cfg(windows))` ([rust-lang/rust#43781])
+    - `#[doc(include = "external-file.md")]` ([rust-lang/rust#44732])
+    - `#[doc(alias = "x")]` ([rust-lang/rust#50146])
+
+[rust-lang/rust#43781]: https://github.com/rust-lang/rust/issues/43781
+[rust-lang/rust#44732]: https://github.com/rust-lang/rust/issues/44732
+[rust-lang/rust#50146]: https://github.com/rust-lang/rust/issues/50146
+
 ## [0.2.2] - 2020-03-30
 
 - Upgraded `syn`, `quote`, and `proc-macro2` to 1.x.
@@ -25,7 +37,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Initial release.
 
-[Unreleased]: https://github.com/yvt/svgbobdoc/compare/0.2.2...HEAD
+[Unreleased]: https://github.com/yvt/svgbobdoc/compare/0.2.3...HEAD
+[0.2.3]: https://github.com/yvt/svgbobdoc/compare/0.2.2...0.2.3
 [0.2.2]: https://github.com/yvt/svgbobdoc/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/yvt/svgbobdoc/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/yvt/svgbobdoc/compare/0.1.0...0.2.0
