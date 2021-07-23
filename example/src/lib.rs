@@ -4,12 +4,19 @@
 //! `#![feature(proc_macro_hygiene)]`, so the following diagram is rendered by
 //! [`svgbobdoc::transform_mdstr!`] instead.)
 //!
+#![doc = svgbobdoc::transform_mdstr!(
+//! ```svgbob,
+//!  .--------------------.
+//!  | Diagrams here      |
+//!  `--------------------'
+//! ```
+)]
 #![doc = svgbobdoc::transform_mdstr!("
-    ```svgbob,
-     .--------------------.
-     | Diagrams here      |
-     `--------------------'
-    ```
+```svgbob,
+ .--------------------.
+ | Diagrams here      |
+ `--------------------'
+```
 ")]
 
 #[svgbobdoc::transform]

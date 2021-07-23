@@ -23,17 +23,17 @@ svgbobdoc = "0.2"
 
 *Requires Rust version 1.54 or later or [`extended_key_value_attributes`](https://caniuse.rs/features/extended_key_value_attrs) nightly feature.*
 
-Wrap the contents of a `#[doc = ...]` attribute with `transform_mdstr!`. Use `svgbob` code blocks to write ASCII diagrams.
+Wrap doc comments with `#[doc = transform_mdstr!(...)]`. Use `svgbob` code blocks to write ASCII diagrams.
 
     /// Some structure.
     ///
-    #[doc = transform_mdstr!("
-        ```svgbob
-         .--------------------.
-         | Diagrams here      |
-         `--------------------'
-        ```
-    ")]
+    #[doc = svgbobdoc::transform_mdstr!(
+    /// ```svgbob
+    ///  .--------------------.
+    ///  | Diagrams here      |
+    ///  `--------------------'
+    /// ```
+    )]
     pub struct TestStruct {}
 
 

@@ -353,26 +353,74 @@ pub fn transform(
     })
 }
 
-/// Render ASCII-diagram code blocks in a Markdown-formatted string literal as
-/// SVG images.
+enum StrOrDocAttrs {
+    Str(LitStr),
+    Attrs(Vec<syn::Attribute>),
+}
+
+impl Parse for StrOrDocAttrs {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
+        if let Ok(lit_str) = input.parse() {
+            Ok(Self::Str(lit_str))
+        } else {
+            // `#[doc = ...]` sequence
+            let mut attrs = Attribute::parse_inner(input)?;
+            attrs.extend(Attribute::parse_outer(input)?);
+            Ok(Self::Attrs(attrs))
+        }
+    }
+}
+
+/// Render ASCII-diagram code blocks in a Markdown-formatted string literal or
+/// zero or more `#[doc = ...]` attributes as SVG images.
 ///
 /// See [the module-level documentation](../index.html) for more.
 #[proc_macro]
 pub fn transform_mdstr(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let st: LitStr = parse_macro_input!(tokens);
+    let input: StrOrDocAttrs = parse_macro_input!(tokens);
+    let (mut iter1, mut iter2);
+    let iter: &mut dyn Iterator<Item = Result<LitStr>> = match input {
+        StrOrDocAttrs::Str(s) => {
+            iter1 = std::iter::once(Ok(s));
+            &mut iter1
+        }
+        StrOrDocAttrs::Attrs(attrs) => {
+            iter2 = attrs
+                .into_iter()
+                .map(|attr| match MaybeDocAttr::from_attribute(attr)? {
+                    MaybeDocAttr::Doc(
+                        _,
+                        syn::MetaNameValue {
+                            lit: syn::Lit::Str(s),
+                            ..
+                        },
+                    ) => Ok(s),
+                    MaybeDocAttr::Doc(attr, _) | MaybeDocAttr::Other(attr) => {
+                        Err(Error::new_spanned(
+                            &attr,
+                            "only `#[doc = ...]` attributes or a string literal are allowed here",
+                        ))
+                    }
+                });
+            &mut iter2
+        }
+    };
+
     handle_error(|| {
         use textproc::{TextProcOutput, TextProcState};
         let mut text_proc = TextProcState::new();
-        let output = text_proc.step(&st.value(), st.span());
+        let mut output = String::new();
+        for lit_str in iter {
+            let st = lit_str?.value();
+            match text_proc.step(&st, st.span()) {
+                TextProcOutput::Passthrough => output.push_str(&st),
+                TextProcOutput::Fragment(fr) => output.push_str(&fr),
+                TextProcOutput::Empty => {}
+            }
+        }
         text_proc.finalize()?;
-        Ok(match output {
-            TextProcOutput::Passthrough => st.into_token_stream().into(),
-            TextProcOutput::Fragment(fr) => LitStr::new(&fr, Span::call_site())
-                .into_token_stream()
-                .into(),
-            TextProcOutput::Empty => LitStr::new("", Span::call_site())
-                .into_token_stream()
-                .into(),
-        })
+        Ok(LitStr::new(&output, Span::call_site())
+            .into_token_stream()
+            .into())
     })
 }
