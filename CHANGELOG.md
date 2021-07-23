@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- **Breaking** Updated `svgbob` to 0.5.
+
 ## [0.2.3] - 2020-10-22
 
 - Fixed the version specification of `lazy_static`.
