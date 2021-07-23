@@ -16,7 +16,7 @@ Add the following line to `Cargo.toml`.
 
 ```toml
 [dependencies]
-svgbobdoc = "0.2"
+svgbobdoc = { version = "0.2", features = ["enable"] }
 ```
 
 ### `transform_mdstr!`
@@ -57,12 +57,7 @@ Limitation: This method does not work with inner attributes, meaning it's unusab
 
 ### Tips
 
- - Using this macro increases the compilation time. If you don't mind
-   activating unstable features, the `doc_cfg` feature ([#43781]) can be
-   used to conditionally enable the macro by the syntax
-   `#[cfg_attr(doc, svgbobdoc::transform)]`.
-
-[#43781]: https://github.com/rust-lang/rust/issues/43781
+ - Using this macro increases the compilation time. The `enable` Cargo feature can be used to turn off the transformation and the dependencies' compilation.
 
 ## Other forms of macros
 

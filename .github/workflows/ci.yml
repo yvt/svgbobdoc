@@ -20,7 +20,7 @@ jobs:
         uses: actions-rs/clippy-check@v1.0.7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: -p svgbobdoc
+          args: -p svgbobdoc --all-features
 
   test:
     name: Test
@@ -40,3 +40,8 @@ jobs:
         with:
           command: test
           args: -p svgbobdoc
+      - name: cargo test with `enable`
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: -p svgbobdoc --features enable
