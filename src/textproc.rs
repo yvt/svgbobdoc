@@ -222,7 +222,7 @@ fn convert_diagram(art: &str, output: &mut String) {
     // to `<text>` elements.
     // (The `SVG` type doesn't support traversal, and I didn't want to add
     // another dependency just for doing this.)
-    let svg_code = re::TEXT_RE.replace_all(&svg_code, |captures: &regex::Captures| {
+    let svg_code = re::TEXT_RE.replace_all(&svg_code, |captures: &regex::Captures<'_>| {
         let attr = captures.get(1).unwrap().as_str();
         let text = captures.get(2).unwrap().as_str();
 

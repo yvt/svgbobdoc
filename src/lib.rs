@@ -59,8 +59,7 @@
 //!
 //! Therefore, despite its downsides, an attribute macro is the only working
 //! solution known at the moment.
-extern crate proc_macro;
-
+#![warn(rust_2018_idioms)]
 use proc_macro2::{Group, TokenStream, TokenTree};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::mem::replace;
@@ -166,7 +165,7 @@ struct ItemInner {
 }
 
 impl Parse for ItemInner {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         // Extract doc comments and remove them from the token stream.
         let all_attrs = input.call(Attribute::parse_inner)?;
         let mut attrs = Vec::new();
@@ -212,7 +211,7 @@ struct OtherItem {
 }
 
 impl Parse for OtherItem {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let mut attrs = input
             .call(Attribute::parse_outer)?
             .into_iter()
@@ -260,7 +259,7 @@ enum Item {
 }
 
 impl Parse for Item {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         if input.fork().parse::<DeriveInput>().is_ok() {
             // TODO: This is not ideal from a performance point of view
             let derive_item = input.parse().unwrap();
