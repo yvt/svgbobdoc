@@ -1,10 +1,6 @@
 // These features are required to apply custom attributes on modules.
 #![feature(proc_macro_hygiene)]
 #![feature(custom_inner_attributes)]
-// The use of `#[cfg_attr(doc, ...)]` is recommended to improve
-// the compilation time on non-doc builds.
-// Unfortunately, it's currently feature-gated.
-#![feature(doc_cfg)]
 // TODO: Get this working... Hopefully when they are stabilized.
 // #![svgbobdoc::transform]
 
@@ -33,7 +29,6 @@ pub mod module {
     //! ```
 }
 
-#[doc(cfg(feature = "xxx"))]
 #[cfg_attr(doc, svgbobdoc::transform)]
 /// Some function.
 ///
