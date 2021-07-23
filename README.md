@@ -5,6 +5,8 @@
 This crate provides a procedural macro that renders
 ASCII diagrams in doc comments as SVG images using [`svgbob`].
 
+*Requires Rust version 1.54 or later or equivalent nightly builds.*
+
 [`svgbob`]: https://github.com/ivanceras/svgbob
 
 <img src="https://yvt.github.io/svgbobdoc/20190529-zhang_hilbert-2.png"
@@ -20,8 +22,6 @@ svgbobdoc = { version = "0.2", features = ["enable"] }
 ```
 
 ### `transform_mdstr!`
-
-*Requires Rust version 1.54 or later or [`extended_key_value_attributes`](https://caniuse.rs/features/extended_key_value_attrs) nightly feature.*
 
 Wrap doc comments with `#[doc = transform_mdstr!(...)]`. Use `svgbob` code blocks to write ASCII diagrams.
 
