@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.3.0-alpha.1] - 2021-07-23
+
 - **Breaking** Updated `svgbob` to 0.5.
 - **Breaking** Code blocks indented by more than three spaces are now processed.
 - **Breaking** The macros are no-op by default. The `enable` Cargo feature must be enabled for the transformation to take place.
@@ -42,7 +44,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Initial release.
 
-[Unreleased]: https://github.com/yvt/svgbobdoc/compare/0.2.3...HEAD
+[Unreleased]: https://github.com/yvt/svgbobdoc/compare/0.3.0-alpha.1...HEAD
+[0.3.0-alpha.1]: https://github.com/yvt/svgbobdoc/compare/0.2.3...0.3.0-alpha.1
 [0.2.3]: https://github.com/yvt/svgbobdoc/compare/0.2.2...0.2.3
 [0.2.2]: https://github.com/yvt/svgbobdoc/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/yvt/svgbobdoc/compare/0.2.0...0.2.1
