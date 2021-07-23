@@ -199,41 +199,49 @@ const DIAGRAM_FONT: &str =
     "'Source Code Pro','Andale Mono','Segoe UI Mono','Dejavu Sans Mono',monospace";
 
 fn convert_diagram(art: &str, output: &mut String) {
+    use svgbob::{
+        sauron::{html::attributes::AttributeValue, Attribute},
+        Node,
+    };
+
     // Convert the diagram to SVG
     let mut settings = svgbob::Settings::default();
     settings.stroke_width = 1.0;
     settings.font_family = DIAGRAM_FONT.to_owned();
     settings.font_size = 13;
 
-    use svgbob::Render;
     let cb = svgbob::CellBuffer::from(art);
     let (mut node, _, _): (svgbob::Node<()>, _, _) = cb.get_node_with_size(&settings);
 
     traverse_pre_order_mut(&mut node, &mut |node| {
-        if node.tag() == Some(&"text") {
-            // Fix the horizontal layouting of texts by adding a `textLength` attribute
-            // to `<text>` elements.
-            use unicode_width::UnicodeWidthStr;
-            let mut width = 0;
-            traverse_pre_order_mut(node, &mut |node| {
-                if let Some(text) = node.text() {
-                    width += text.width();
+        match node {
+            Node::Element(elem) if elem.tag == "text" => {
+                // Fix the horizontal layouting of texts by adding a `textLength` attribute
+                // to `<text>` elements.
+                use unicode_width::UnicodeWidthStr;
+                let mut width = 0;
+                for child in elem.get_children() {
+                    if let Some(text) = child.text() {
+                        width += text.width();
+                    }
                 }
-                true
-            });
 
-            let text_len = width as f32 * settings.scale as f32;
-            node.add_attributes_ref_mut(vec![svgbob::sauron::Attribute::new(
-                None,
-                "textLength",
-                svgbob::sauron::html::attributes::AttributeValue::from_value(text_len.into()),
-            )]);
+                let text_len = width as f32 * settings.scale as f32;
+                elem.attrs.push(Attribute::new(
+                    None,
+                    "textLength",
+                    AttributeValue::from_value(text_len.into()),
+                ));
 
-            return false;
+                return false;
+            }
+            _ => {}
         }
+
         true
     });
 
+    use svgbob::Render;
     let mut svg_code = String::new();
     node.render(&mut svg_code).unwrap();
 
