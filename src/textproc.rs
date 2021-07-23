@@ -241,6 +241,24 @@ fn convert_diagram(art: &str, output: &mut String) {
         true
     });
 
+    // Fix the height of the image
+    // <https://github.com/ivanceras/svgbob/issues/77>
+    let new_height = settings.scale * 2.0 * art.lines().count() as f32;
+    match &mut node {
+        svgbob::Node::Element(elem) => {
+            for attr in elem.attrs.iter_mut() {
+                if attr.name() == &"height" {
+                    *attr = Attribute::new(
+                        None,
+                        "height",
+                        AttributeValue::from_value(new_height.into()),
+                    );
+                }
+            }
+        }
+        _ => unreachable!(),
+    }
+
     use svgbob::Render;
     let mut svg_code = String::new();
     node.render(&mut svg_code).unwrap();
