@@ -73,7 +73,7 @@ impl TextProcState {
             use regex::Regex;
             lazy_static! {
                 pub static ref FENCE_RE: Regex =
-                    Regex::new(r"^( {0,3}(?:`{3,}|~{3,}))\s*(.*?)\s*$").unwrap();
+                    Regex::new(r"^( *(?:`{3,}|~{3,}))\s*(.*?)\s*$").unwrap();
             }
         }
 
