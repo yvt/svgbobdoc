@@ -203,6 +203,7 @@ fn convert_diagram(art: &str, output: &mut String) {
     let mut settings = svgbob::Settings::default();
     settings.stroke_width = 1.0;
     settings.font_family = DIAGRAM_FONT.to_owned();
+    settings.font_size = 13;
 
     use svgbob::Render;
     let cb = svgbob::CellBuffer::from(art);
