@@ -1,20 +1,18 @@
-// These features are required to apply custom attributes on modules.
-#![feature(proc_macro_hygiene)]
-#![feature(custom_inner_attributes)]
-// TODO: Get this working... Hopefully when they are stabilized.
-// #![svgbobdoc::transform]
-
 //! Some module.
 //!
-//! (The inner attributes of non-inline modules can't be processed well, so
-//! the following code block isn't rendered for now.)
+//! (Applying custom inner attributes currently requires
+//! `#![feature(proc_macro_hygiene)]`, so the following diagram is rendered by
+//! [`svgbobdoc::transform_mdstr!`] instead.)
 //!
-//! ```svgbob,
-//!  .--------------------.
-//!  | Diagrams here      |
-//!  `--------------------'
-//! ```
+#![doc = svgbobdoc::transform_mdstr!("
+    ```svgbob,
+     .--------------------.
+     | Diagrams here      |
+     `--------------------'
+    ```
+")]
 
+#[svgbobdoc::transform]
 /// Some module.
 ///
 /// ```svgbob,
@@ -23,7 +21,6 @@
 ///  `---------------'
 /// ```
 pub mod module {
-    #![svgbobdoc::transform]
     //! ```svgbob,
     //! hoge
     //! ```

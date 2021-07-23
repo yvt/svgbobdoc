@@ -1,6 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![warn(rust_2018_idioms)]
-use proc_macro2::{Group, TokenStream, TokenTree};
+use proc_macro2::{Group, Span, TokenStream, TokenTree};
 use quote::{quote, ToTokens, TokenStreamExt};
 use std::mem::replace;
 use syn::{
@@ -350,5 +350,29 @@ pub fn transform(
         }
 
         Ok(item.into_token_stream().into())
+    })
+}
+
+/// Render ASCII-diagram code blocks in a Markdown-formatted string literal as
+/// SVG images.
+///
+/// See [the module-level documentation](../index.html) for more.
+#[proc_macro]
+pub fn transform_mdstr(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let st: LitStr = parse_macro_input!(tokens);
+    handle_error(|| {
+        use textproc::{TextProcOutput, TextProcState};
+        let mut text_proc = TextProcState::new();
+        let output = text_proc.step(&st.value(), st.span());
+        text_proc.finalize()?;
+        Ok(match output {
+            TextProcOutput::Passthrough => st.into_token_stream().into(),
+            TextProcOutput::Fragment(fr) => LitStr::new(&fr, Span::call_site())
+                .into_token_stream()
+                .into(),
+            TextProcOutput::Empty => LitStr::new("", Span::call_site())
+                .into_token_stream()
+                .into(),
+        })
     })
 }

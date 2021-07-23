@@ -19,8 +19,29 @@ Add the following line to `Cargo.toml`.
 svgbobdoc = "0.2"
 ```
 
-Add the attribute `#[svgbobdoc::transform]` to the items to documentate.
-Use `svgbob` code blocks to write ASCII diagrams.
+### `transform_mdstr!`
+
+*Requires Rust version 1.54 or later or [`extended_key_value_attributes`](https://caniuse.rs/features/extended_key_value_attrs) nightly feature.*
+
+Wrap the contents of a `#[doc = ...]` attribute with `transform_mdstr!`. Use `svgbob` code blocks to write ASCII diagrams.
+
+    /// Some structure.
+    ///
+    #[doc = transform_mdstr!("
+        ```svgbob
+         .--------------------.
+         | Diagrams here      |
+         `--------------------'
+        ```
+    ")]
+    pub struct TestStruct {}
+
+
+See the `example` directory for a complete example.
+
+### `#[transform]`
+
+Add the attribute `#[svgbobdoc::transform]` to the items to documentate. Use `svgbob` code blocks to write ASCII diagrams.
 
     #[svgbobdoc::transform]
     /// Some structure.
@@ -32,7 +53,7 @@ Use `svgbob` code blocks to write ASCII diagrams.
     /// ```
     pub struct TestStruct {}
 
-See the `example` directory for a complete example.
+Limitation: This method does not work with inner attributes, meaning it's unusable for a crate-level documentation.
 
 ### Tips
 
@@ -49,10 +70,6 @@ The macro is currently implemented as an attribute macro, which has
 restrictions, e.g., they cannot be attached to fields and non-inline
 modules. Other forms of macros were considered, but they were unusable for
 this purpose for the following reasons:
-
- - Function-like macros producing a string literal
-   (`#[doc = svgbobdoc::to_svg!("...")]`): Macros in this position aren't
-   expanded, causing a parsing error.
 
  - Function-like macros producing a part of an attribute
    (`#[svgbobdoc::doc!("...")]`): Macros in this position aren't expanded,
