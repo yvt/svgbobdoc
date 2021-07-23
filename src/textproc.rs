@@ -204,9 +204,7 @@ fn convert_diagram(art: &str, output: &mut String) {
     settings.stroke_width = 1.0;
     settings.font_family = DIAGRAM_FONT.to_owned();
 
-    let g = svgbob::Grid::from_str(art, &settings);
-    let svg = g.get_svg();
-    let svg_code = format!("{}", svg);
+    let svg_code = svgbob::to_svg_with_settings(art, &settings);
 
     // The use of `#[doc]` in `lazy_static!` causes name collision, so
     // wrap it with a `mod`
@@ -227,7 +225,7 @@ fn convert_diagram(art: &str, output: &mut String) {
         let text = captures.get(2).unwrap().as_str();
 
         let width = width_xml_text(&text);
-        let text_len = width as f32 * settings.text_width;
+        let text_len = width as f32 * settings.font_size as f32 * 0.5;
 
         format!("<text{} textLength=\"{}\">{}</text>", attr, text_len, text)
     });

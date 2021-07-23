@@ -18,7 +18,7 @@ maintenance = { status = "passively-maintained" }
 [dependencies]
 syn = "1"
 quote = "1"
-svgbob = "0.4.1"
+svgbob = "0.5"
 proc-macro2 = "1"
 regex = "1"
 lazy_static = "1.1"
