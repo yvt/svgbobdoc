@@ -85,6 +85,7 @@ impl Into<Attribute> for MaybeDocAttr {
 ///
 /// See [the module-level documentation](../index.html) for more.
 #[proc_macro_attribute]
+#[deprecated]
 pub fn transform(
     _attr: proc_macro::TokenStream,
     tokens: proc_macro::TokenStream,

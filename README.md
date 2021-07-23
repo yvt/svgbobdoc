@@ -25,9 +25,9 @@ svgbobdoc = { version = "0.2", features = ["enable"] }
 
 Wrap doc comments with `#[doc = transform_mdstr!(...)]`. Use `svgbob` code blocks to write ASCII diagrams.
 
+    #[doc = svgbobdoc::transform_mdstr!(
     /// Some structure.
     ///
-    #[doc = svgbobdoc::transform_mdstr!(
     /// ```svgbob
     ///  .--------------------.
     ///  | Diagrams here      |
@@ -39,7 +39,7 @@ Wrap doc comments with `#[doc = transform_mdstr!(...)]`. Use `svgbob` code block
 
 See the `example` directory for a complete example.
 
-### `#[transform]`
+### `#[transform]` (deprecated)
 
 Add the attribute `#[svgbobdoc::transform]` to the items to documentate. Use `svgbob` code blocks to write ASCII diagrams.
 
