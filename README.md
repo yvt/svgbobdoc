@@ -59,21 +59,4 @@ Limitation: This method does not work with inner attributes, meaning it's unusab
 
  - Using this macro increases the compilation time. The `enable` Cargo feature can be used to turn off the transformation and the dependencies' compilation.
 
-## Other forms of macros
-
-The macro is currently implemented as an attribute macro, which has
-restrictions, e.g., they cannot be attached to fields and non-inline
-modules. Other forms of macros were considered, but they were unusable for
-this purpose for the following reasons:
-
- - Function-like macros producing a part of an attribute
-   (`#[svgbobdoc::doc!("...")]`): Macros in this position aren't expanded,
-   causing a parsing error.
-
- - Function-like macros expanding to an attribute (`svgbobdoc::doc!("...")`):
-   Procedural macros cannot expand to an attribute.
-
-Therefore, despite its downsides, an attribute macro is the only working
-solution known at the moment.
-
 License: MIT/Apache-2.0
