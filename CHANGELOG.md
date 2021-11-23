@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - The version specification of `syn` is now more specific.
 - Removed the dependency on `regex`.
 - When the `enable` Cargo feature is not enabled, SVG images with unprocessed texts are produced instead of not transforming code blocks at all.
+- Added support for `base64` 0.13.
 
 ## [0.3.0-alpha.1] - 2021-07-23
 
