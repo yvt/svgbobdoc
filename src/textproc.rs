@@ -72,7 +72,7 @@ impl TextProcState {
             };
         }
 
-        /// ```
+        /// ```text
         /// ^( *(?:`{3,}|~{3,}))\s*(.*?)\s*$
         /// ```
         fn detect_fence(s: &str) -> Option<(&str, &str)> {
