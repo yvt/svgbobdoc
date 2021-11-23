@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Removed the dependency on `regex`.
 - When the `enable` Cargo feature is not enabled, SVG images with unprocessed texts are produced instead of not transforming code blocks at all.
 - Added support for `base64` 0.13.
+- Code blocks now accept a link label (e.g., `~~~svgbob,[link-label]`, which can be inserted to a different location by `![link-label]`).
 
 ## [0.3.0-alpha.1] - 2021-07-23
 

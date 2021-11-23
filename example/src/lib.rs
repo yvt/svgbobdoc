@@ -4,6 +4,15 @@
 //! `#![feature(proc_macro_hygiene)]`, so the following diagram is rendered by
 //! [`svgbobdoc::transform_mdstr!`] instead.)
 //!
+//! This figure is referenced by a label (`![diagram]`): ![diagram]
+//!
+#![doc = transform_mdstr!(
+//! ```svgbob,[diagram]
+//!  .----------------------.
+//!  | Another diagram here |
+//!  `----------------------'
+//! ```
+)]
 #![doc = transform_mdstr!(
 //! ```svgbob,
 //!  .--------------------.

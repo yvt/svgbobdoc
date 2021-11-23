@@ -17,6 +17,12 @@ struct CodeBlock {
 #[derive(Debug)]
 struct CapturedCodeBlock {
     content: String,
+    params: CodeBlockParams,
+}
+
+#[derive(Debug)]
+struct CodeBlockParams {
+    label: Option<String>,
 }
 
 /// The output of `TextProcState::step`.
@@ -126,7 +132,11 @@ impl TextProcState {
 
                         // Convert this captured code block to a SVG diagram.
                         captured.content.pop(); // Remove trailing "\n"
-                        convert_diagram(&captured.content, new_frag.as_mut().unwrap());
+                        convert_diagram(
+                            &captured.content,
+                            new_frag.as_mut().unwrap(),
+                            captured.params,
+                        );
                     }
 
                     close_code_block = true;
@@ -146,12 +156,24 @@ impl TextProcState {
                         start: span,
                     };
 
-                    if language == "svgbob" || language.starts_with("svgbob,") {
+                    let params: Option<CodeBlockParams> = language
+                        .strip_prefix("svgbob")
+                        .and_then(|rest| {
+                            if rest.is_empty() {
+                                Some("") // exactly "svgbob"
+                            } else {
+                                rest.strip_prefix(",") // `Some` if "svgbob,[...]"
+                            }
+                        })
+                        .map(|params| params.parse().unwrap());
+
+                    if let Some(params) = params {
                         // This is the code blcok we are interested in.
                         // Capture the contents.
                         passthrough_line = false;
                         code_block.captured = Some(CapturedCodeBlock {
                             content: String::new(),
+                            params,
                         });
                     }
 
@@ -202,6 +224,26 @@ impl TextProcState {
     }
 }
 
+impl std::str::FromStr for CodeBlockParams {
+    type Err = std::convert::Infallible;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        let mut this = CodeBlockParams { label: None };
+
+        let parts = s.split(",").map(|s| s.trim());
+        for part in parts {
+            if let Some(label) = part
+                .strip_prefix("[")
+                .and_then(|part| part.strip_suffix("]"))
+            {
+                this.label = Some(label.to_owned());
+            }
+        }
+
+        Ok(this)
+    }
+}
+
 /// The font used for diagrams.
 ///
 /// The selection made here attempts to approximate the monospace font used by
@@ -210,14 +252,23 @@ impl TextProcState {
 const DIAGRAM_FONT: &str =
     "'Source Code Pro','Andale Mono','Segoe UI Mono','Dejavu Sans Mono',monospace";
 
-fn convert_diagram(art: &str, output: &mut String) {
+fn convert_diagram(art: &str, output: &mut String, params: CodeBlockParams) {
     let svg_code = to_svg(art);
 
     // Output the SVG as an image element
     use std::fmt::Write;
     let svg_base64 = base64::encode(&*svg_code);
 
-    write!(output, "![](data:image/svg+xml;base64,{})", svg_base64).unwrap();
+    if let Some(label) = params.label {
+        writeln!(
+            output,
+            "\n[{}]: data:image/svg+xml;base64,{}",
+            label, svg_base64
+        )
+        .unwrap();
+    } else {
+        write!(output, "![](data:image/svg+xml;base64,{})", svg_base64).unwrap();
+    }
 }
 
 #[cfg(feature = "enable")]
