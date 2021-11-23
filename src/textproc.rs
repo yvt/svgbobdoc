@@ -211,6 +211,17 @@ const DIAGRAM_FONT: &str =
     "'Source Code Pro','Andale Mono','Segoe UI Mono','Dejavu Sans Mono',monospace";
 
 fn convert_diagram(art: &str, output: &mut String) {
+    let svg_code = to_svg(art);
+
+    // Output the SVG as an image element
+    use std::fmt::Write;
+    let svg_base64 = base64::encode(&*svg_code);
+
+    write!(output, "![](data:image/svg+xml;base64,{})", svg_base64).unwrap();
+}
+
+#[cfg(feature = "enable")]
+fn to_svg(art: &str) -> String {
     use svgbob::{
         sauron::{html::attributes::AttributeValue, Attribute},
         Node,
@@ -275,13 +286,10 @@ fn convert_diagram(art: &str, output: &mut String) {
     let mut svg_code = String::new();
     node.render(&mut svg_code).unwrap();
 
-    // Output the SVG as an image element
-    use std::fmt::Write;
-    let svg_base64 = base64::encode(&*svg_code);
-
-    write!(output, "![](data:image/svg+xml;base64,{})", svg_base64).unwrap();
+    svg_code
 }
 
+#[cfg(feature = "enable")]
 fn traverse_pre_order_mut<MSG>(
     node: &mut svgbob::Node<MSG>,
     cb: &mut dyn FnMut(&mut svgbob::Node<MSG>) -> bool,
@@ -293,4 +301,104 @@ fn traverse_pre_order_mut<MSG>(
             }
         }
     }
+}
+
+#[cfg(not(feature = "enable"))]
+fn to_svg(art: &str) -> String {
+    use std::fmt::Write;
+    use unicode_width::UnicodeWidthStr;
+
+    let lines = art.lines();
+    let cols = lines
+        .clone()
+        .map(|line| line.width())
+        .fold(0, std::cmp::max);
+    let rows = lines.clone().count();
+
+    let col_width = 8;
+    let width = cols * col_width;
+    let height = rows * 16;
+
+    let mut content = String::new();
+    for (i, line) in lines.enumerate() {
+        let mut x = 0;
+        let y = i * 16 + 12;
+        let mut last_i = 0;
+
+        // Divide `line` by whitespace so that each text span is positioned
+        // precisely at their endpoints
+        split_whitespace_indices(line, |span, start_i| {
+            x += line[last_i..start_i].width() * col_width;
+            last_i = start_i;
+
+            write!(
+                content,
+                r#"<text x="{}" y="{}" textLength="{}">"#,
+                x,
+                y,
+                span.width() * col_width,
+            )
+            .unwrap();
+            escape_html(span, &mut content);
+            content.push_str("</text>");
+        });
+    }
+
+    fn split_whitespace_indices(mut s: &str, mut f: impl FnMut(&str, usize)) {
+        // Skip the the first whitespace characters
+        let s_trimmed = s.trim_start();
+        let mut offset = s.len() - s_trimmed.len();
+        s = s_trimmed;
+        while !s.is_empty() {
+            // Find the first whitespace character
+            let i = s
+                .char_indices()
+                .find(|(_, c)| c.is_whitespace())
+                .map(|(i, _)| i);
+
+            // Emit a span comprised of non-whitespace characters
+            {
+                let i = i.unwrap_or(s.len());
+                let part = &s[..i];
+                f(part, offset);
+                offset += i;
+                s = &s[i..];
+            }
+
+            // Skip the subsequent whitespace characters
+            let s_trimmed = s.trim_start();
+            offset += s.len() - s_trimmed.len();
+            s = s_trimmed;
+        }
+    }
+
+    fn escape_html(mut s: &str, out: &mut String) {
+        loop {
+            let i = s
+                .as_bytes()
+                .iter()
+                .position(|b| matches!(b, b'<' | b'>' | b'&' | 0));
+            out.push_str(&s[..i.unwrap_or(s.len())]);
+            if let Some(i) = i {
+                out.push_str(match s.as_bytes()[i] {
+                    b'<' => "&lt;",
+                    b'>' => "&gt;",
+                    b'&' => "&amp;",
+                    0 => " ",
+                    _ => unreachable!(),
+                });
+                s = &s[i + 1..];
+            } else {
+                break;
+            }
+        }
+    }
+
+    format!(
+        include_str!("minimal_template.svg"),
+        font = DIAGRAM_FONT,
+        width = width,
+        height = height,
+        content = content,
+    )
 }

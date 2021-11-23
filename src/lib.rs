@@ -8,9 +8,7 @@ use syn::{
     parse_macro_input, AttrStyle, Attribute, Error, Lit, LitStr, Meta, MetaNameValue, Result,
 };
 
-#[cfg(feature = "enable")]
 mod textproc;
-#[cfg(feature = "enable")]
 mod xform_attr;
 
 /// An `Attribute`, recognized as a doc comment or not.
@@ -90,12 +88,7 @@ pub fn transform(
     _attr: proc_macro::TokenStream,
     tokens: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    match () {
-        #[cfg(feature = "enable")]
-        () => xform_attr::transform_inner(tokens),
-        #[cfg(not(feature = "enable"))]
-        () => tokens,
-    }
+    xform_attr::transform_inner(tokens)
 }
 
 enum StrOrDocAttrs {
@@ -153,31 +146,19 @@ pub fn transform_mdstr(tokens: proc_macro::TokenStream) -> proc_macro::TokenStre
 
     handle_error(|| {
         let mut output = String::new();
-        match () {
-            #[cfg(feature = "enable")]
-            () => {
-                use textproc::{TextProcOutput, TextProcState};
-                let mut text_proc = TextProcState::new();
-                for lit_str in iter {
-                    let lit_str = lit_str?;
-                    let st = lit_str.value();
-                    match text_proc.step(&st, lit_str.span()) {
-                        TextProcOutput::Passthrough => output.push_str(&st),
-                        TextProcOutput::Fragment(fr) => output.push_str(&fr),
-                        TextProcOutput::Empty => {}
-                    }
-                    output.push_str("\n");
-                }
-                text_proc.finalize()?;
+        use textproc::{TextProcOutput, TextProcState};
+        let mut text_proc = TextProcState::new();
+        for lit_str in iter {
+            let lit_str = lit_str?;
+            let st = lit_str.value();
+            match text_proc.step(&st, lit_str.span()) {
+                TextProcOutput::Passthrough => output.push_str(&st),
+                TextProcOutput::Fragment(fr) => output.push_str(&fr),
+                TextProcOutput::Empty => {}
             }
-            #[cfg(not(feature = "enable"))]
-            () => {
-                for lit_str in iter {
-                    output.push_str(&lit_str?.value());
-                    output.push_str("\n");
-                }
-            }
+            output.push_str("\n");
         }
+        text_proc.finalize()?;
 
         Ok(LitStr::new(&output, Span::call_site())
             .into_token_stream()

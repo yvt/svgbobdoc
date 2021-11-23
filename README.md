@@ -57,6 +57,6 @@ Limitation: This method does not work with inner attributes, meaning it's unusab
 
 ### Tips
 
- - Using this macro increases the compilation time. The `enable` Cargo feature can be used to turn off the transformation and the dependencies' compilation.
+ - Using this macro increases the compilation time. The `enable` Cargo feature can be used to turn off the transformation and the compilation of most dependent packages.
 
 License: MIT/Apache-2.0

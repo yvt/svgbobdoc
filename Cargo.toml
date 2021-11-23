@@ -17,15 +17,15 @@ maintenance = { status = "passively-maintained" }
 
 [features]
 default = []
-enable = ["svgbob", "base64", "unicode-width"]
+enable = ["svgbob"]
 
 [dependencies]
 syn = "1.0.41"
 quote = "1"
 svgbob = { version = "0.5", optional = true }
 proc-macro2 = "1"
-base64 = { version = ">= 0.5.2, < 0.13", optional = true }
-unicode-width = { version = "0.1", optional = true }
+base64 = ">= 0.5.2, < 0.13"
+unicode-width = "0.1"
 
 [lib]
 proc-macro = true
