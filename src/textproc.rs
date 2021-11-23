@@ -66,15 +66,30 @@ impl TextProcState {
             };
         }
 
-        // The use of `#[doc]` in `lazy_static!` causes name collision, so
-        // wrap it with a `mod`
-        mod re {
-            use lazy_static::lazy_static;
-            use regex::Regex;
-            lazy_static! {
-                pub static ref FENCE_RE: Regex =
-                    Regex::new(r"^( *(?:`{3,}|~{3,}))\s*(.*?)\s*$").unwrap();
-            }
+        /// ```
+        /// ^( *(?:`{3,}|~{3,}))\s*(.*?)\s*$
+        /// ```
+        fn detect_fence(s: &str) -> Option<(&str, &str)> {
+            let bytes = s.as_bytes();
+            let fence_len = {
+                let indent = bytes.iter().take_while(|&&b| b == b' ').count();
+                let fence_ch = *bytes.get(indent)?;
+                if !matches!(fence_ch, b'`' | b'~') {
+                    return None;
+                }
+                let fence = bytes[indent..]
+                    .iter()
+                    .take_while(|&&b| b == fence_ch)
+                    .count();
+                if fence < 3 {
+                    return None;
+                }
+                indent + fence
+            };
+
+            let (fence, rest) = s.split_at(fence_len);
+
+            Some((fence, rest.trim()))
         }
 
         fn remove_indent<'a>(mut line: &'a str, mut indent: &str) -> &'a str {
@@ -124,10 +139,7 @@ impl TextProcState {
                 }
             } else {
                 // Detect a code block
-                if let Some(mat) = re::FENCE_RE.captures(line) {
-                    let fence = mat.get(1).unwrap().as_str();
-                    let language = mat.get(2).unwrap().as_str();
-
+                if let Some((fence, language)) = detect_fence(line) {
                     let mut code_block = CodeBlock {
                         fence: fence.to_owned(),
                         captured: None,
