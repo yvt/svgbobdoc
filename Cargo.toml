@@ -20,7 +20,7 @@ default = []
 enable = ["svgbob", "regex", "lazy_static", "base64", "unicode-width"]
 
 [dependencies]
-syn = "1"
+syn = "1.0.41"
 quote = "1"
 svgbob = { version = "0.5", optional = true }
 proc-macro2 = "1"

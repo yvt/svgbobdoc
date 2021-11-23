@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+- The version specification of `syn` is now more specific.
+
 ## [0.3.0-alpha.1] - 2021-07-23
 
 - **Breaking** Updated `svgbob` to 0.5.
