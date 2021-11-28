@@ -292,11 +292,10 @@ fn to_svg(art: &str) -> String {
             Node::Element(elem) if elem.tag == "text" => {
                 // Fix the horizontal layouting of texts by adding a `textLength` attribute
                 // to `<text>` elements.
-                use unicode_width::UnicodeWidthStr;
                 let mut width = 0;
                 for child in elem.get_children() {
                     if let Some(text) = child.text() {
-                        width += text.width();
+                        width += xml_text_width(text);
                     }
                 }
 
@@ -338,6 +337,31 @@ fn to_svg(art: &str) -> String {
     node.render(&mut svg_code).unwrap();
 
     svg_code
+}
+
+/// Like [`unicode_width::UnicodeWidthStr`] but handles some entity references
+/// (e.g., `&amp;`). Assumes the input is in a valid form of an XML text node.
+#[cfg(feature = "enable")]
+fn xml_text_width(html_text: &str) -> usize {
+    use unicode_width::UnicodeWidthStr;
+    html_text
+        .split('&')
+        .enumerate()
+        .map(|(i, mut part)| {
+            if i > 0 {
+                if let Some(k) = part.find(';') {
+                    // "& a m p ;"
+                    //  ^ ^^^^^ ^
+                    //  │   │   └─ This part is preserved so that this entity is
+                    //  │   │      counted as one cell
+                    //  │   └─ We remove this part now
+                    //  └─ This part is removed by `split`
+                    part = &part[k..];
+                }
+            }
+            part.width()
+        })
+        .sum()
 }
 
 #[cfg(feature = "enable")]
