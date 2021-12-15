@@ -39,22 +39,6 @@ Wrap doc comments with `#[doc = transform_mdstr!(...)]`. Use `svgbob` code block
 
 See the `example` directory for a complete example.
 
-### `#[transform]` (deprecated)
-
-Add the attribute `#[svgbobdoc::transform]` to the items to documentate. Use `svgbob` code blocks to write ASCII diagrams.
-
-    #[svgbobdoc::transform]
-    /// Some structure.
-    ///
-    /// ~~~svgbob
-    ///  .--------------------.
-    ///  | Diagrams here      |
-    ///  `--------------------'
-    /// ~~~
-    pub struct TestStruct {}
-
-Limitation: This method does not work with inner attributes, meaning it's unusable for a crate-level documentation.
-
 ### Tips
 
  - Using this macro increases the compilation time. The `enable` Cargo feature can be used to turn off the transformation and the compilation of most dependent packages.

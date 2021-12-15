@@ -9,7 +9,6 @@ use syn::{
 };
 
 mod textproc;
-mod xform_attr;
 
 /// An `Attribute`, recognized as a doc comment or not.
 #[derive(Clone)]
@@ -74,21 +73,6 @@ impl Into<Attribute> for MaybeDocAttr {
             MaybeDocAttr::Other(attr) => attr,
         }
     }
-}
-
-/// Render ASCII-diagram code blocks in doc comments as SVG images.
-///
-/// This macro transforms the attached item and all of its documentable fields
-/// (e.g., fields, which cannot have attribute macros).
-///
-/// See [the module-level documentation](../index.html) for more.
-#[proc_macro_attribute]
-#[deprecated]
-pub fn transform(
-    _attr: proc_macro::TokenStream,
-    tokens: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
-    xform_attr::transform_inner(tokens)
 }
 
 enum StrOrDocAttrs {
