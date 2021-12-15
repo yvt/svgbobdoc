@@ -250,7 +250,7 @@ impl std::str::FromStr for CodeBlockParams {
 /// rustdoc's stylesheet. Source Code Pro isn't necessarily available because
 /// images can't access the containing page's `@font-face`.
 const DIAGRAM_FONT: &str =
-    "'Source Code Pro','Andale Mono','Segoe UI Mono','Dejavu Sans Mono',monospace";
+    "'Source Code Pro','Andale Mono','Segoe UI Mono','Dejavu Sans Mono','Consolas',monospace";
 
 fn convert_diagram(art: &str, output: &mut String, params: CodeBlockParams) {
     let svg_code = to_svg(art);
