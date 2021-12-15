@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Added Consolas to the diagram font list.
 - **Breaking** `#[svgbobdoc::transform]` was removed.
+- **Breaking** Renamed `svgbobdoc::transform_mdstr!` to `svgbobdoc::transform!`.
 
 ## [0.3.0-alpha.3] - 2021-11-28
 

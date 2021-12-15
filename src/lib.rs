@@ -98,7 +98,7 @@ impl Parse for StrOrDocAttrs {
 ///
 /// See [the module-level documentation](../index.html) for more.
 #[proc_macro]
-pub fn transform_mdstr(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn transform(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input: StrOrDocAttrs = parse_macro_input!(tokens);
     let (mut iter1, mut iter2);
     let iter: &mut dyn Iterator<Item = Result<LitStr>> = match input {

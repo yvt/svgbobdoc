@@ -1,35 +1,31 @@
 //! Some module.
 //!
-//! (Applying custom inner attributes currently requires
-//! `#![feature(proc_macro_hygiene)]`, so the following diagram is rendered by
-//! [`svgbobdoc::transform_mdstr!`] instead.)
-//!
 //! This figure is referenced by a label (`![diagram]`): ![diagram]
 //!
-#![doc = transform_mdstr!(
+#![doc = transform!(
 //! ```svgbob,[diagram]
 //!  .----------------------.
 //!  | Another diagram here |
 //!  `----------------------'
 //! ```
 )]
-#![doc = transform_mdstr!(
+#![doc = transform!(
 //! ```svgbob,
 //!  .----------.
 //!  | Mutex<T> |
 //!  `----------'
 //! ```
 )]
-#![doc = transform_mdstr!("
+#![doc = transform!("
 ```svgbob,
  .--------------------.
  | Diagrams here      |
  `--------------------'
 ```
 ")]
-use svgbobdoc::transform_mdstr;
+use svgbobdoc::transform;
 
-#[doc = transform_mdstr!(
+#[doc = transform!(
 /// Some module.
 ///
 /// ```svgbob,
@@ -39,16 +35,16 @@ use svgbobdoc::transform_mdstr;
 /// ```
 )]
 pub mod module {
-    #![doc = transform_mdstr!(
+    #![doc = transform!(
     //! ```svgbob,
     //! hoge
     //! ```
     )]
 
-    use svgbobdoc::transform_mdstr;
+    use svgbobdoc::transform;
 }
 
-#[doc = transform_mdstr!(
+#[doc = transform!(
 /// Some function.
 ///
 /// ```svgbob,
@@ -59,7 +55,7 @@ pub mod module {
 )]
 pub fn test_function() {}
 
-#[doc = transform_mdstr!(
+#[doc = transform!(
 /// Some structure.
 ///
 /// ```svgbob,
@@ -69,7 +65,7 @@ pub fn test_function() {}
 /// ```
 )]
 pub struct TestStruct {
-    #[doc = transform_mdstr!(
+    #[doc = transform!(
     /// ```svgbob,
     ///  .--------------------.
     ///  | Diagrams here      |
@@ -79,7 +75,7 @@ pub struct TestStruct {
     pub field1: u32,
 }
 
-#[doc = transform_mdstr!(
+#[doc = transform!(
 /**
  * Some impl.
  *
@@ -91,7 +87,7 @@ pub struct TestStruct {
  */
 )]
 impl TestStruct {
-    #[doc = transform_mdstr!(
+    #[doc = transform!(
     /// Some method.
     ///
     /// ```svgbob,

@@ -21,11 +21,11 @@ Add the following line to `Cargo.toml`.
 svgbobdoc = { version = "0.2", features = ["enable"] }
 ```
 
-### `transform_mdstr!`
+### `transform!`
 
-Wrap doc comments with `#[doc = transform_mdstr!(...)]`. Use `svgbob` code blocks to write ASCII diagrams.
+Wrap doc comments with `#[doc = transform!(...)]`. Use `svgbob` code blocks to write ASCII diagrams.
 
-    #[doc = svgbobdoc::transform_mdstr!(
+    #[doc = svgbobdoc::transform!(
     /// Some structure.
     ///
     /// ```svgbob
