@@ -337,6 +337,11 @@ fn to_svg(art: &str) -> String {
             _ => {}
         }
     }
+    elem.attrs.push(Attribute::new(
+        None,
+        "style",
+        AttributeValue::from_value("transform:translate(0.5px,0.5px)".into()),
+    ));
 
     use svgbob::Render;
     let mut svg_code = String::new();

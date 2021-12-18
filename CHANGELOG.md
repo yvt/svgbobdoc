@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 - Added Consolas to the diagram font list.
+- The macro now adds `transform: translate(0.5px, 0.5px)` to the root `svg` element to ensure pixel snapping on a low-DPI monitor.
 - **Breaking** `#[svgbobdoc::transform]` was removed.
 - **Breaking** Renamed `svgbobdoc::transform_mdstr!` to `svgbobdoc::transform!`.
 
