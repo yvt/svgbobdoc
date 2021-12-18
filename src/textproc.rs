@@ -314,22 +314,28 @@ fn to_svg(art: &str) -> String {
         true
     });
 
-    // Fix the height of the image
-    // <https://github.com/ivanceras/svgbob/issues/77>
-    let new_height = settings.scale * 2.0 * art.lines().count() as f32;
-    match &mut node {
-        svgbob::Node::Element(elem) => {
-            for attr in elem.attrs.iter_mut() {
-                if attr.name() == &"height" {
-                    *attr = Attribute::new(
-                        None,
-                        "height",
-                        AttributeValue::from_value(new_height.into()),
-                    );
-                }
+    // FIXME: Replace with let-else when stabilized
+    let elem = if let svgbob::Node::Element(elem) = &mut node {
+        elem
+    } else {
+        unreachable!()
+    };
+
+    // Patch the root element (`<svg>`)
+    for attr in elem.attrs.iter_mut() {
+        match *attr.name() {
+            "height" => {
+                // Fix the height of the image
+                // <https://github.com/ivanceras/svgbob/issues/77>
+                let new_height = settings.scale * 2.0 * art.lines().count() as f32;
+                *attr = Attribute::new(
+                    None,
+                    "height",
+                    AttributeValue::from_value(new_height.into()),
+                );
             }
+            _ => {}
         }
-        _ => unreachable!(),
     }
 
     use svgbob::Render;
