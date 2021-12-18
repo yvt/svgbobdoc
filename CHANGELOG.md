@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.3.0-alpha.4] - 2021-12-18
 
 - Added Consolas to the diagram font list.
 - The macro now adds `transform: translate(0.5px, 0.5px)` to the root `svg` element to ensure pixel snapping on a low-DPI monitor.
@@ -63,7 +64,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Initial release.
 
-[Unreleased]: https://github.com/yvt/svgbobdoc/compare/0.3.0-alpha.1...HEAD
+[Unreleased]: https://github.com/yvt/svgbobdoc/compare/0.3.0-alpha.4...HEAD
+[0.3.0-alpha.4]: https://github.com/yvt/svgbobdoc/compare/0.3.0-alpha.3...0.3.0-alpha.4
+[0.3.0-alpha.3]: https://github.com/yvt/svgbobdoc/compare/0.3.0-alpha.2...0.3.0-alpha.3
+[0.3.0-alpha.2]: https://github.com/yvt/svgbobdoc/compare/0.3.0-alpha.1...0.3.0-alpha.2
 [0.3.0-alpha.1]: https://github.com/yvt/svgbobdoc/compare/0.2.3...0.3.0-alpha.1
 [0.2.3]: https://github.com/yvt/svgbobdoc/compare/0.2.2...0.2.3
 [0.2.2]: https://github.com/yvt/svgbobdoc/compare/0.2.1...0.2.2
