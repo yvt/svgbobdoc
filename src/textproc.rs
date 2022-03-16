@@ -294,8 +294,10 @@ fn to_svg(art: &str) -> String {
                 // to `<text>` elements.
                 let mut width = 0;
                 for child in elem.get_children() {
-                    if let Some(text) = child.text() {
-                        width += xml_text_width(text);
+                    if let Node::Leaf(leaf) = child {
+                        if leaf.is_text() {
+                            width += xml_text_width(leaf.unwrap_text());
+                        }
                     }
                 }
 

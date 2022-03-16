@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+- Updated `svgbob` to 0.6.6. (Fixes the compilation failure due to a breaking dependency change in `svgbob` 0.6.6.)
+
 ## [0.3.0-alpha.4] - 2021-12-18
 
 - Added Consolas to the diagram font list.
