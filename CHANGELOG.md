@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-- Updated `svgbob` to 0.6.6. (Fixes the compilation failure due to a breaking dependency change in `svgbob` 0.6.6.)
+- Pinned `svgbob` to 0.6.6. (Fixes the compilation failure due to a breaking dependency change in `svgbob` 0.6.6.)
 
 ## [0.3.0-alpha.4] - 2021-12-18
 
