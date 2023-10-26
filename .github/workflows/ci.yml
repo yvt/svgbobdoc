@@ -12,8 +12,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.60
         with:
           components: clippy
-      - run: rustup component add clippy
-      - run: cargo clippy -p svgbobdoc --all-features
+      - name: cargo clippy
+        run: cargo clippy -p svgbobdoc --all-features
 
   test:
     name: Test
@@ -21,6 +21,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.6)
-      - run: cargo test -p svgbobdoc
-      - run: cargo test -p svgbobdoc --features enable
+      - uses: dtolnay/rust-toolchain@1.60
+      - name: Test
+        run: cargo test -p svgbobdoc
+      - name: Test with feature `enable`
+        run: cargo test -p svgbobdoc --features enable
