@@ -1,3 +1,4 @@
+use base64::{Engine as _, engine::general_purpose};
 use proc_macro2::Span;
 use syn::{Error, Result};
 
@@ -257,7 +258,7 @@ fn convert_diagram(art: &str, output: &mut String, params: CodeBlockParams) {
 
     // Output the SVG as an image element
     use std::fmt::Write;
-    let svg_base64 = base64::encode(&*svg_code);
+    let svg_base64 = general_purpose::STANDARD.encode(&*svg_code);
 
     if let Some(label) = params.label {
         writeln!(
