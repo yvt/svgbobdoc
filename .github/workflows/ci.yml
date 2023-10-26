@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.60
+      - uses: dtolnay/rust-toolchain@1.60.0
         with:
           components: clippy
       - name: cargo clippy
@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.60
+      - uses: dtolnay/rust-toolchain@1.60.0
       - name: Test
         run: cargo test -p svgbobdoc
       - name: Test with feature `enable`
