@@ -1,3 +1,4 @@
+use base64::{engine::general_purpose, Engine as _};
 use proc_macro2::Span;
 use syn::{Error, Result};
 
@@ -50,12 +51,13 @@ impl TextProcState {
 
         // If `new_frag` is `None`, then this flag indicates whether the input
         // fragment is outputed as-is.
-        let mut passthrough = match self.code_block {
+        let mut passthrough = !matches!(
+            self.code_block,
             Some(CodeBlock {
-                captured: Some(_), ..
-            }) => false,
-            _ => true,
-        };
+                captured: Some(_),
+                ..
+            })
+        );
 
         // Disables "pass-through" mode, preparing `new_frag` for custom
         // generation.
@@ -99,8 +101,8 @@ impl TextProcState {
         }
 
         fn remove_indent<'a>(mut line: &'a str, mut indent: &str) -> &'a str {
-            while line.len() > 0
-                && indent.len() > 0
+            while !line.is_empty()
+                && !indent.is_empty()
                 && line.as_bytes()[0] == indent.as_bytes()[0]
                 && (indent.as_bytes()[0] == b' ' || indent.as_bytes()[0] == b'\t')
             {
@@ -140,12 +142,10 @@ impl TextProcState {
                     }
 
                     close_code_block = true;
-                } else {
-                    if let Some(captured) = &mut code_block.captured {
-                        captured.content += remove_indent(line, &code_block.fence);
-                        captured.content.push('\n');
-                        passthrough_line = false;
-                    }
+                } else if let Some(captured) = &mut code_block.captured {
+                    captured.content += remove_indent(line, &code_block.fence);
+                    captured.content.push('\n');
+                    passthrough_line = false;
                 }
             } else {
                 // Detect a code block
@@ -192,10 +192,8 @@ impl TextProcState {
                         new_frag.push('\n');
                     }
                 }
-            } else {
-                if passthrough {
-                    prepare_nonpassthrough_emission!();
-                }
+            } else if passthrough {
+                prepare_nonpassthrough_emission!();
             }
 
             if let Some(next_break) = next_break {
@@ -257,7 +255,7 @@ fn convert_diagram(art: &str, output: &mut String, params: CodeBlockParams) {
 
     // Output the SVG as an image element
     use std::fmt::Write;
-    let svg_base64 = base64::encode(&*svg_code);
+    let svg_base64 = general_purpose::STANDARD.encode(&*svg_code);
 
     if let Some(label) = params.label {
         writeln!(
@@ -293,10 +291,10 @@ fn to_svg(art: &str) -> String {
                 // Fix the horizontal layouting of texts by adding a `textLength` attribute
                 // to `<text>` elements.
                 let mut width = 0;
-                for child in elem.get_children() {
+                for child in elem.children() {
                     if let Node::Leaf(leaf) = child {
                         if leaf.is_text() {
-                            width += xml_text_width(leaf.unwrap_text());
+                            width += xml_text_width(leaf.as_text().unwrap());
                         }
                     }
                 }
@@ -305,7 +303,7 @@ fn to_svg(art: &str) -> String {
                 elem.attrs.push(Attribute::new(
                     None,
                     "textLength",
-                    AttributeValue::from_value(text_len.into()),
+                    AttributeValue::from(text_len),
                 ));
 
                 return false;
@@ -330,11 +328,7 @@ fn to_svg(art: &str) -> String {
                 // Fix the height of the image
                 // <https://github.com/ivanceras/svgbob/issues/77>
                 let new_height = settings.scale * 2.0 * art.lines().count() as f32;
-                *attr = Attribute::new(
-                    None,
-                    "height",
-                    AttributeValue::from_value(new_height.into()),
-                );
+                *attr = Attribute::new(None, "height", AttributeValue::from(new_height));
             }
             _ => {}
         }
@@ -342,7 +336,7 @@ fn to_svg(art: &str) -> String {
     elem.attrs.push(Attribute::new(
         None,
         "style",
-        AttributeValue::from_value("transform:translate(0.5px,0.5px)".into()),
+        AttributeValue::from("transform:translate(0.5px,0.5px)"),
     ));
 
     use svgbob::Render;
