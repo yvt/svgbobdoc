@@ -5,7 +5,7 @@
 This crate provides a procedural macro that renders
 ASCII diagrams in doc comments as SVG images using [`svgbob`].
 
-*Requires Rust version 1.54 or later or equivalent nightly builds.*
+*Requires Rust version 1.73 or later or equivalent nightly builds.*
 
 [`svgbob`]: https://github.com/ivanceras/svgbob
 

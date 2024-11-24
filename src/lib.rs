@@ -1,11 +1,13 @@
 #![doc = include_str!("../README.md")]
 #![warn(rust_2018_idioms)]
 use proc_macro2::{Span, TokenStream};
-use quote::{quote, ToTokens};
+use quote::ToTokens;
 use syn::{
     self,
     parse::{Parse, ParseStream},
-    parse_macro_input, AttrStyle, Attribute, Error, Lit, LitStr, Meta, MetaNameValue, Result,
+    parse_macro_input,
+    spanned::Spanned,
+    AttrStyle, Attribute, Error, Expr, ExprLit, Lit, LitStr, Meta, MetaNameValue, Result,
 };
 
 mod textproc;
@@ -17,7 +19,7 @@ enum MaybeDocAttr {
     ///
     /// The first `Attribute` only specifies the surround tokens.
     ///
-    /// `MetaNameValue::lit` must be a `Lit::Str(_)`.
+    /// `MetaNameValue::value` must be a `Expr::Lit(_)`.
     Doc(Attribute, MetaNameValue),
     /// An unrecognized attribute that we don't care.
     Other(Attribute),
@@ -25,14 +27,18 @@ enum MaybeDocAttr {
 
 impl MaybeDocAttr {
     fn from_attribute(attr: Attribute) -> Result<Self> {
-        if attr.path.is_ident("doc") {
-            let meta = attr.parse_meta()?;
+        if attr.path().is_ident("doc") {
+            let meta = attr.meta.clone();
 
             if let Meta::NameValue(nv) = meta {
-                if let Lit::Str(_) = nv.lit {
-                    Ok(MaybeDocAttr::Doc(attr, nv))
+                if let Expr::Lit(expr) = &nv.value {
+                    if let Lit::Str(_) = expr.lit {
+                        Ok(MaybeDocAttr::Doc(attr, nv.clone()))
+                    } else {
+                        Err(Error::new(expr.lit.span(), "doc comment must be a string"))
+                    }
                 } else {
-                    Err(Error::new(nv.lit.span(), "doc comment must be a string"))
+                    Err(Error::new(nv.value.span(), "doc comment must be a string"))
                 }
             } else {
                 // Ignore unrecognized form
@@ -61,13 +67,12 @@ impl ToTokens for MaybeDocAttr {
     }
 }
 
-impl Into<Attribute> for MaybeDocAttr {
+impl From<MaybeDocAttr> for Attribute {
     /// The mostly-lossless conversion to `Attribute`.
-    fn into(self) -> Attribute {
-        match self {
+    fn from(val: MaybeDocAttr) -> Attribute {
+        match val {
             MaybeDocAttr::Doc(mut attr, nv) => {
-                let lit = nv.lit;
-                attr.tokens = quote! { = #lit };
+                attr.meta = Meta::NameValue(nv);
                 attr
             }
             MaybeDocAttr::Other(attr) => attr,
@@ -101,19 +106,20 @@ impl Parse for StrOrDocAttrs {
 pub fn transform(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input: StrOrDocAttrs = parse_macro_input!(tokens);
     let (mut iter1, mut iter2);
-    let iter: &mut dyn Iterator<Item = Result<LitStr>> = match input {
-        StrOrDocAttrs::Str(s) => {
-            iter1 = std::iter::once(Ok(s));
-            &mut iter1
-        }
-        StrOrDocAttrs::Attrs(attrs) => {
-            iter2 = attrs
-                .into_iter()
-                .map(|attr| match MaybeDocAttr::from_attribute(attr)? {
+    let iter: &mut dyn Iterator<Item = Result<LitStr>> =
+        match input {
+            StrOrDocAttrs::Str(s) => {
+                iter1 = std::iter::once(Ok(s));
+                &mut iter1
+            }
+            StrOrDocAttrs::Attrs(attrs) => {
+                iter2 =
+                    attrs.into_iter().map(|attr| {
+                        match MaybeDocAttr::from_attribute(attr)? {
                     MaybeDocAttr::Doc(
                         _,
-                        syn::MetaNameValue {
-                            lit: syn::Lit::Str(s),
+                        MetaNameValue {
+                            value: Expr::Lit (ExprLit { lit: Lit::Str(s), .. }),
                             ..
                         },
                     ) => Ok(s),
@@ -123,10 +129,11 @@ pub fn transform(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
                             "only `#[doc = ...]` attributes or a string literal are allowed here",
                         ))
                     }
-                });
-            &mut iter2
-        }
-    };
+                }
+                    });
+                &mut iter2
+            }
+        };
 
     handle_error(|| {
         let mut output = String::new();
@@ -140,7 +147,7 @@ pub fn transform(tokens: proc_macro::TokenStream) -> proc_macro::TokenStream {
                 TextProcOutput::Fragment(fr) => output.push_str(&fr),
                 TextProcOutput::Empty => {}
             }
-            output.push_str("\n");
+            output.push('\n');
         }
         text_proc.finalize()?;
 
