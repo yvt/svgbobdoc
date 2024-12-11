@@ -22,7 +22,7 @@ enable = ["svgbob"]
 [dependencies]
 syn = "2"
 quote = "1"
-svgbob = { version = "0.7", optional = true }
+svgbob = { version = "0.7.5", optional = true }
 proc-macro2 = "1"
 base64 = ">= 0.21, < 0.23"
 unicode-width = ">= 0.1, < 0.3"

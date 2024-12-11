@@ -272,7 +272,7 @@ fn convert_diagram(art: &str, output: &mut String, params: CodeBlockParams) {
 #[cfg(feature = "enable")]
 fn to_svg(art: &str) -> String {
     use svgbob::{
-        sauron::{html::attributes::AttributeValue, Attribute},
+        sauron::{Attribute, AttributeValue},
         Node,
     };
 
@@ -300,11 +300,11 @@ fn to_svg(art: &str) -> String {
                 }
 
                 let text_len = width as f32 * settings.scale as f32;
-                elem.attrs.push(Attribute::new(
+                elem.add_attributes([Attribute::new(
                     None,
                     "textLength",
                     AttributeValue::from(text_len),
-                ));
+                )]);
 
                 return false;
             }
@@ -315,31 +315,35 @@ fn to_svg(art: &str) -> String {
     });
 
     // FIXME: Replace with let-else when stabilized
-    let elem = if let svgbob::Node::Element(elem) = &mut node {
+    let elem = if let Node::Element(elem) = &mut node {
         elem
     } else {
         unreachable!()
     };
 
     // Patch the root element (`<svg>`)
-    for attr in elem.attrs.iter_mut() {
-        match *attr.name() {
+    let mut new_attrs = Vec::with_capacity(elem.attributes().len() + 1);
+    for attr in elem.attributes() {
+        let new_attr = match *attr.name() {
             "height" => {
                 // Fix the height of the image
                 // <https://github.com/ivanceras/svgbob/issues/77>
                 let new_height = settings.scale * 2.0 * art.lines().count() as f32;
-                *attr = Attribute::new(None, "height", AttributeValue::from(new_height));
+                Attribute::new(None, "height", AttributeValue::from(new_height))
             }
-            _ => {}
-        }
+            _ => attr.clone(),
+        };
+
+        new_attrs.push(new_attr);
     }
-    elem.attrs.push(Attribute::new(
+
+    new_attrs.push(Attribute::new(
         None,
         "style",
         AttributeValue::from("transform:translate(0.5px,0.5px)"),
     ));
+    elem.set_attributes(new_attrs);
 
-    use svgbob::Render;
     let mut svg_code = String::new();
     node.render(&mut svg_code).unwrap();
 
